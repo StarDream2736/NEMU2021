@@ -69,22 +69,26 @@ static int cmd_info(char *args) {	//打印寄存器状态
     return 0;
 }
 
-static int cmd_x(char *args) {
-  /* 1. 取 N */
-  char *sN = strtok(args, " ");
-  if (!sN) return 0;
-  int N = atoi(sN);
+static int cmd_x(char *args) {  // 扫描内存
+  char* s_num1 = strtok(args, " ");
+  if (s_num1 == NULL) return 0;
+  int num1 = atoi(s_num1);
 
-  /* 2. 取 EXPR 并求值（调用已有表达式求值接口） */
-  char *expr_str = strtok(NULL, " ");
-  if (!expr_str) return 0;
-  uint32_t addr = expr(expr_str, NULL);   /* 计算表达式结果当地址 */
+  char* s_num2 = strtok(NULL, " ");
+  if (s_num2 == NULL) return 0;
 
-  /* 3. 一次读 4 字节，共 N 次 */
+  uint32_t addr = (uint32_t)strtol(s_num2 + 2, NULL, 16);
+
+  printf("%s:\t", s_num2);
   int i;
-  for (i = 0; i < N; i++) {
-    uint32_t data = swaddr_read(addr + i * 4, 4);  /* 4 字节宽 */
-    printf("0x%08x\n", data);                      /* 每行 1 个 32 位数 */
+  for (i = 0; i < num1 << 2; i++) {
+    printf("0x%02x ", swaddr_read(addr + i, 1));
+    if ((i + 1) % 4 == 0) {
+      printf("\n");
+      if (i + 1 < num1 << 2) {
+        printf("0x%x:\t", addr + i + 1);
+      }
+    }
   }
   return 0;
 }
