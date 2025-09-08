@@ -69,37 +69,28 @@ static int cmd_info(char *args) {	//打印寄存器状态
     return 0;
 }
 
-static int cmd_x(char *args) {	//扫描内存
+static int cmd_x(char *args) {  // 扫描内存
   char* s_num1 = strtok(args, " ");
-  if (s_num1 == NULL) {
-    return 0;
-  }
+  if (s_num1 == NULL) return 0;
   int num1 = atoi(s_num1);
-  char* s_num2 = strtok(args, " ");
-  if (s_num2 == NULL) {
-    return 0;
-  }
 
-  uint32_t addr = (uint32_t)strtol(s_num2+2, NULL, 16);
+  char* s_num2 = strtok(NULL, " ");
+  if (s_num2 == NULL) return 0;
+
+  uint32_t addr = (uint32_t)strtol(s_num2 + 2, NULL, 16);
 
   printf("%s:\t", s_num2);
-  int i,j;
-  for (i = 0; i < num1 << 2; i++) { 
-    printf("0x%02x ", swaddr_read(addr + i, 1)); 
+  int i;
+  for (i = 0; i < num1 << 2; i++) {
+    printf("0x%02x ", swaddr_read(addr + i, 1));
     if ((i + 1) % 4 == 0) {
-      printf("\t");
-      for (j = i - 3; j <= i; j++) {
-        printf("%-4d ", swaddr_read(addr + j, 1));
-      }
       printf("\n");
-      if (i + 1 == num1 << 2) {
-        printf("\n");
-      } else {
+      if (i + 1 < num1 << 2) {
         printf("0x%x:\t", addr + i + 1);
       }
     }
   }
-  return 0;  
+  return 0;
 }
 
 static int cmd_help(char *args);
