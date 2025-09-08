@@ -53,12 +53,17 @@ static int cmd_info(char *args) {	//打印寄存器状态
     }
 
     if (strcmp(op, "r") == 0) {
-        extern CPU_state cpu;          
-        printf("eax 0x%08x  ecx 0x%08x  edx 0x%08x  ebx 0x%08x\n",
-               cpu.eax, cpu.ecx, cpu.edx, cpu.ebx);
-        printf("esp 0x%08x  ebp 0x%08x  esi 0x%08x  edi 0x%08x\n",
-               cpu.esp, cpu.ebp, cpu.esi, cpu.edi);
-    } else {
+    extern CPU_state cpu;
+    printf("eax\t0x%08x\t%-10u\n", cpu.eax, cpu.eax);
+    printf("ecx\t0x%08x\t%-10u\n", cpu.ecx, cpu.ecx);
+    printf("edx\t0x%08x\t%-10u\n", cpu.edx, cpu.edx);
+    printf("ebx\t0x%08x\t%-10u\n", cpu.ebx, cpu.ebx);
+    printf("esp\t0x%08x\t%-10u\n", cpu.esp, cpu.esp);
+    printf("ebp\t0x%08x\t%-10u\n", cpu.ebp, cpu.ebp);
+    printf("esi\t0x%08x\t%-10u\n", cpu.esi, cpu.esi);
+    printf("edi\t0x%08x\t%-10u\n", cpu.edi, cpu.edi);
+	printf("eip\t0x%08x\t%-10u\n", cpu.eip, cpu.eip);
+	} else {
         printf("Unknown info option: %s\n", op);
     }
     return 0;
