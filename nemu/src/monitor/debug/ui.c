@@ -70,24 +70,30 @@ static int cmd_info(char *args) {	//打印寄存器状态
 }
 
 static int cmd_x(char *args) {
-  /* 1. 取 N */
   char *sN = strtok(args, " ");
-  if (!sN) return 0;
-  int N = atoi(sN);
+  if (!sN) 
+  	return 0;
+  int N = atoi(sN);               
 
-  /* 2. 取十六进制字符串并解析 */
   char *hexStr = strtok(NULL, " ");
-  if (!hexStr) return 0;
+  if (!hexStr) 
+  	return 0;
+	
   uint32_t addr = (uint32_t)strtol(hexStr, NULL, 16);
 
-  /* 3. 一次读 4 字节，共 N 次 */
   int i;
   for (i = 0; i < N; ++i) {
-    uint32_t data = swaddr_read(addr + i * 4, 4);
-    printf("0x%08x\n", data);
+    if (i % 4 == 0)               
+      printf("0x%08x: ", addr + i * 4);
+      printf("0x%08x ", swaddr_read(addr + i * 4, 4));
+
+    if ((i + 1) % 4 == 0) puts("");   
   }
+  if (N % 4) 
+  	puts("");                
   return 0;
 }
+
 static int cmd_help(char *args);
 
 static struct {
