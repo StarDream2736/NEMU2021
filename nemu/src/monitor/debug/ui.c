@@ -27,22 +27,41 @@ char* rl_gets() {
 	return line_read;
 }
 
-static int cmd_c(char *args) {
+static int cmd_c(char *args) {	//继续运行被暂停的程序
 	cpu_exec(-1);
 	return 0;
 }
 
-static int cmd_q(char *args) {
+static int cmd_q(char *args) {	//退出NEMU
 	return -1;
 }
 
-static int cmd_si(char *args) {
+static int cmd_si(char *args) {	//逐步执行程序
     char *arg = strtok(args, " ");
     int num = 1;
     if (arg != NULL) {
         num = atoi(arg);
     }
     cpu_exec(num);
+    return 0;
+}
+
+static int cmd_info(char *args)
+{
+    char *op = strtok(args, " ");
+    if (op == NULL) {
+        return 0;
+    }
+
+    if (strcmp(op, "r") == 0) {
+        extern CPU_state cpu;          
+        printf("eax 0x%08x  ecx 0x%08x  edx 0x%08x  ebx 0x%08x\n",
+               cpu.eax, cpu.ecx, cpu.edx, cpu.ebx);
+        printf("esp 0x%08x  ebp 0x%08x  esi 0x%08x  edi 0x%08x\n",
+               cpu.esp, cpu.ebp, cpu.esi, cpu.edi);
+    } else {
+        printf("Unknown info option: %s\n", op);
+    }
     return 0;
 }
 
@@ -57,6 +76,7 @@ static struct {
 	{ "c", "Continue the execution of the program", cmd_c },
 	{ "q", "Exit NEMU", cmd_q },
 	{ "si", "逐步执行", cmd_si },
+	{ "info", "打印程序状态", cmd_info },
 
 	/* TODO: Add more commands */
 
