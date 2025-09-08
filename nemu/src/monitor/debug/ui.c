@@ -64,7 +64,7 @@ static int cmd_info(char *args) {	//打印寄存器状态
     return 0;
 }
 
-static int cmd_x(char *args) {
+static int cmd_x(char *args) {	//扫描内存
   char* s_num1 = strtok(args, " ");
   if (s_num1 == NULL) {
     return 0;
