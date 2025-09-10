@@ -26,6 +26,7 @@ static struct rule {
 	{"\\+", '+'},					// plus
 	{"==", EQ},						// equal
 
+	{"-[0-9]+", NUM},// negtive numbers
   	{"\\-", '-'},  // minus
   	{"\\*", '*'},  // multiply
 	{"/", '/'},    // divide
@@ -196,6 +197,8 @@ uint32_t eval(int p, int q) {
 	else if (p == q) {
 		if (tokens[p].type == NUM) {
 			return atoi(tokens[p].str);
+		} else if (tokens[p].type == HEX) {
+        return strtoul(tokens[p].str, NULL, 16); 
 		} else {
 			panic("eval: 这不是数嘞");
 		}
