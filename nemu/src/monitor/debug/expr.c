@@ -140,6 +140,9 @@ bool check_parentheses(int p, int q) {
 			balance++;
 		} else if (tokens[i].type == ')') {
 			balance--;
+			if (balance == 0 && i < q) {
+    			return false;
+			}
 		}
 		if (balance < 0) {
 			return false;
