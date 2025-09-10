@@ -190,7 +190,7 @@ int find_dominant_operator(int p, int q) {
     return dominant_op;
 }
 
-uint32_t eval(int p, int q) {
+int32_t eval(int p, int q) {
 	if (p > q) {
 		panic("eval: p > q");
 	}
@@ -244,7 +244,7 @@ int cmd_p_run(char *args) {
     uint32_t result = expr(args, &success);
 
     if (success) {
-        printf("Result: %u\n", result);
+        printf("Result: %d\n", result);
     } else {
         printf("Someting went wrong!\n");
     }
