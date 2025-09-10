@@ -91,17 +91,19 @@ bool make_token(char *e) {
 						break;
 					case '+':
 					case '-':
-					case '*':
+				case '*':
 					case '/':
+					case '(':
+					case ')':
 					case EQ:
 					case NEQ:
 					case OR:
 					case AND:
-						tokens[nr_token].type = rules[i].token_type;
-						tokens[nr_token].str[0] = e[position - 1];
-						tokens[nr_token].str[1] = '\0';
-						nr_token++;
-						break;
+   						tokens[nr_token].type = rules[i].token_type;
+    					tokens[nr_token].str[0] = substr_start[0];  // 修改这里
+    					tokens[nr_token].str[1] = '\0';
+    					nr_token++;
+    					break;
 					case REG:
 					case HEX:
 					case NUM:
@@ -148,28 +150,28 @@ bool check_parentheses(int p, int q) {
 }
 
 int find_dominant_operator(int p, int q) {
-	int max_priority = -1;
-	int dominant_op = -1;
-	int i;
-	for (i = q; i >= p; i--) {
-		switch (tokens[i].type) {
-			case '+':
-			case '-':
-				if (max_priority < 1) {
-					max_priority = 1;
-					dominant_op = i;
-				}
-				break;
-			case '*':
-			case '/':
-				if (max_priority < 2) {
-					max_priority = 2;
-					dominant_op = i;
-				}
-				break;
-		}
-	}
-	return dominant_op;
+    int min_priority = 999;  
+    int dominant_op = -1;
+    int i;
+    for (i = q; i >= p; i--) {
+        switch (tokens[i].type) {
+            case '+':
+            case '-':
+                if (min_priority >= 1) {  
+                    min_priority = 1;
+                    dominant_op = i;
+                }
+                break;
+            case '*':
+            case '/':
+                if (min_priority >= 2) {  
+                    min_priority = 2;
+                    dominant_op = i;
+                }
+                break;
+        }
+    }
+    return dominant_op;
 }
 
 uint32_t eval(int p, int q) {
