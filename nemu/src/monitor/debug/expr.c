@@ -210,17 +210,13 @@ uint32_t expr(char *e, bool *success) {
 		*success = false;
 		return 0;
 	}
+	*success = true;
 	return eval(0,nr_token-1);
 }
 
 int cmd_p_run(char *args) {
     if (args == NULL || args[0] == '\0') {
         printf("啥也不输啥意思\n");
-        return 0;
-    }
-
-    if (!make_token(args)) {
-        printf("你要不看看help?\n");
         return 0;
     }
 
