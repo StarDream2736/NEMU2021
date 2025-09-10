@@ -148,62 +148,98 @@ bool check_parentheses(int p, int q) {
 	return balance == 0;
 }
 
+
 int find_dominant_operator(int p, int q) {
-	int max_priority = -1;
-	int dominant_op = -1;
-	int i;
-	for (i = q; i >= p; i--) {
-		switch (tokens[i].type) {
-			case '+':
-			case '-':
-				if (max_priority < 1) {
-					max_priority = 1;
-					dominant_op = i;
-				}
-				break;
-			case '*':
-			case '/':
-				if (max_priority < 2) {
-					max_priority = 2;
-					dominant_op = i;
-				}
-				break;
-		}
-	}
-	return dominant_op;
+    int max_priority = -1;
+    int dominant_op = -1;
+    int paren_depth = 0;
+    int i;
+    
+    for (i = q; i >= p; i--) {
+    
+        if (tokens[i].type == ')') {
+            paren_depth++;
+            continue;
+        } else if (tokens[i].type == '(') {
+            paren_depth--;
+            continue;
+        }
+        
+        if (paren_depth == 0) {
+            int priority = -1;
+            
+            switch (tokens[i].type) {
+                case OR:
+                    priority = 0;
+                    break;
+                case AND:
+                    priority = 1;
+                    break;
+                case EQ:
+                case NEQ:
+                    priority = 2;
+                    break;
+                case '+':
+                case '-':
+                    priority = 3;
+                    break;
+                case '*':
+                case '/':
+                    priority = 4;
+                    break;
+            }
+            
+            if (priority != -1 && (max_priority == -1 || priority < max_priority)) {
+                max_priority = priority;
+                dominant_op = i;
+            }
+        }
+    }
+    
+    return dominant_op;
 }
 
 uint32_t eval(int p, int q) {
-	if (p > q) {
-		panic("eval: p > q");
-	}
-	else if (p == q) {
-		if (tokens[p].type == NUM) {
-			return atoi(tokens[p].str);
-		} else {
-			panic("eval: 这不是数嘞");
-		}
-	}
-	else if (check_parentheses(p, q)) {
-		return eval(p + 1, q - 1);
-	}
-	else {
-		int dominant_op = find_dominant_operator(p, q);
-		if (dominant_op == -1) {
-			panic("eval: 俺没找到嘞");
-		}
+    if (p > q) {
+        panic("eval: p > q");
+    }
+    else if (p == q) {
+        if (tokens[p].type == NUM) {
+            return atoi(tokens[p].str);
+        } else if (tokens[p].type == HEX) {
+            return strtoul(tokens[p].str, NULL, 16);
+        } else {
+            panic("eval: 这不是数嘞");
+        }
+    }
+    else if (check_parentheses(p, q)) {
+        return eval(p + 1, q - 1);
+    }
+    else {
+        int dominant_op = find_dominant_operator(p, q);
+        if (dominant_op == -1) {
+            panic("eval: 俺没找到嘞");
+        }
 
-		uint32_t left = eval(p, dominant_op - 1);
-		uint32_t right = eval(dominant_op + 1, q);
+        uint32_t left = eval(p, dominant_op - 1);
+        uint32_t right = eval(dominant_op + 1, q);
 
-		switch (tokens[dominant_op].type) {
-			case '+': return left + right;
-			case '-': return left - right;
-			case '*': return left * right;
-			case '/': return left / right;
-			default: panic("eval: 俺不认得嘞");
-		}
-	}
+        switch (tokens[dominant_op].type) {
+            case '+': return left + right;
+            case '-': return left - right;
+            case '*': return left * right;
+            case '/': 
+                if (right == 0) {
+                    panic("eval: 除零错误");
+                }
+                return left / right;
+            case EQ: return left == right ? 1 : 0;
+            case NEQ: return left != right ? 1 : 0;
+            case AND: return left && right ? 1 : 0;
+            case OR: return left || right ? 1 : 0;
+            default: panic("eval: 俺不认得嘞");
+        }
+    }
 }
 
 uint32_t expr(char *e, bool *success) {
