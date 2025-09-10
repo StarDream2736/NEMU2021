@@ -153,35 +153,32 @@ int find_dominant_operator(int p, int q) {
     int min_priority = 999;
     int dominant_op = -1;
     int i;
-    int paren_level = 0;  // 括号嵌套层级
+    int paren_level = 0;  
     
-    // 从右到左扫描，找到优先级最低且不在括号内的运算符
     for (i = q; i >= p; i--) {
-        // 处理括号层级
+        // 括号层级
         if (tokens[i].type == ')') {
             paren_level++;
         } else if (tokens[i].type == '(') {
             paren_level--;
         }
         
-        // 只有在括号外的运算符才考虑
+        // 括号外的运算符
         if (paren_level == 0) {
             int current_priority = -1;
             
             switch (tokens[i].type) {
                 case '+':
                 case '-':
-                    current_priority = 1;  // 加减法优先级最低
+                    current_priority = 1;  // 加减
                     break;
                 case '*':
                 case '/':
-                    current_priority = 2;  // 乘除法优先级较高
+                    current_priority = 2;  // 乘除
                     break;
                 default:
-                    continue;  // 不是运算符，跳过
+                    continue;  //跳过
             }
-            
-            // 找优先级最低的运算符（数字越小优先级越低）
             if (current_priority <= min_priority) {
                 min_priority = current_priority;
                 dominant_op = i;
