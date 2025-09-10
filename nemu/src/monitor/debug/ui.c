@@ -2,7 +2,6 @@
 #include "monitor/expr.h"
 #include "monitor/watchpoint.h"
 #include "nemu.h"
-
 #include <stdlib.h>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -94,6 +93,11 @@ static int cmd_x(char *args) {
   return 0;
 }
 
+static int cmd_p(char *args) {
+	cmd_p_run(args);
+    return 0;
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -107,6 +111,7 @@ static struct {
 	{ "si", "逐步执行", cmd_si },
 	{ "info", "打印程序状态", cmd_info },
 	{ "x", "扫描内存", cmd_x},
+	{ "p", "表达式求值", cmd_p},
 
 	/* TODO: Add more commands */
 
