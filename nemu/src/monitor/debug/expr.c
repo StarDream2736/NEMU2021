@@ -85,11 +85,7 @@ bool make_token(char *e) {
 				Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s", i, rules[i].regex, position, substr_len, substr_len, substr_start);
 				position += substr_len;
 
-				/* TODO: Now a new token is recognized with rules[i]. Add codes
-				 * to record the token in the array `tokens'. For certain types
-				 * of tokens, some extra actions should be performed.
-				 */
-
+				/* Record the token in the array `tokens'. */
 				switch(rules[i].token_type) {
 					case NOTYPE:
 						break;
@@ -130,6 +126,7 @@ bool make_token(char *e) {
 
 	return true; 
 }
+
 
 bool check_parentheses(int p, int q) {
 	if (tokens[p].type != '(' || tokens[q].type != ')') {
@@ -223,7 +220,7 @@ int cmd_p_run(char *args) {
     }
 
     if (!make_token(args)) {
-        printf("你要不看看help？\n");
+        printf("你要不看看help?\n");
         return 0;
     }
 
