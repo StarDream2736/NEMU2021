@@ -93,14 +93,15 @@ bool make_token(char *e) {
 					case '-':
 					case '*':
 					case '/':
+					case '(':  
+					case ')':
 					case EQ:
 					case NEQ:
 					case OR:
 					case AND:
 						tokens[nr_token].type = rules[i].token_type;
-						tokens[nr_token].str[0] = e[position - 1];
-						tokens[nr_token].str[1] = '\0';
-						nr_token++;
+						strncpy(tokens[nr_token].str, substr_start, substr_len);  
+						tokens[nr_token].str[substr_len] = '\0';  
 						break;
 					case REG:
 					case HEX:
