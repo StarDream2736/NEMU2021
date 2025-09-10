@@ -100,7 +100,7 @@ bool make_token(char *e) {
 					case OR:
 					case AND:
    						tokens[nr_token].type = rules[i].token_type;
-    					tokens[nr_token].str[0] = substr_start[0];  // 修改这里
+    					tokens[nr_token].str[0] = substr_start[0];  
     					tokens[nr_token].str[1] = '\0';
     					nr_token++;
     					break;
@@ -150,27 +150,45 @@ bool check_parentheses(int p, int q) {
 }
 
 int find_dominant_operator(int p, int q) {
-    int min_priority = 999;  
+    int min_priority = 999;
     int dominant_op = -1;
     int i;
+    int paren_level = 0;  // 括号嵌套层级
+    
+    // 从右到左扫描，找到优先级最低且不在括号内的运算符
     for (i = q; i >= p; i--) {
-        switch (tokens[i].type) {
-            case '+':
-            case '-':
-                if (min_priority >= 1) {  
-                    min_priority = 1;
-                    dominant_op = i;
-                }
-                break;
-            case '*':
-            case '/':
-                if (min_priority >= 2) {  
-                    min_priority = 2;
-                    dominant_op = i;
-                }
-                break;
+        // 处理括号层级
+        if (tokens[i].type == ')') {
+            paren_level++;
+        } else if (tokens[i].type == '(') {
+            paren_level--;
+        }
+        
+        // 只有在括号外的运算符才考虑
+        if (paren_level == 0) {
+            int current_priority = -1;
+            
+            switch (tokens[i].type) {
+                case '+':
+                case '-':
+                    current_priority = 1;  // 加减法优先级最低
+                    break;
+                case '*':
+                case '/':
+                    current_priority = 2;  // 乘除法优先级较高
+                    break;
+                default:
+                    continue;  // 不是运算符，跳过
+            }
+            
+            // 找优先级最低的运算符（数字越小优先级越低）
+            if (current_priority <= min_priority) {
+                min_priority = current_priority;
+                dominant_op = i;
+            }
         }
     }
+    
     return dominant_op;
 }
 
