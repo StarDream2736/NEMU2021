@@ -33,7 +33,7 @@ static struct rule {
   	{"\\(", '('},
   	{"\\)", ')'},
   	{"!=",NEQ},        //not equal
-  	{"\\$(e[abcd]x|e[sd]i|ebp|esp|[abcd]h|[abcd]l|\\$0|ra|[sgt]p|t[0-6]|a[0-7]|s([0-9]|1[0-1]))", REG},		//registers
+  	{"\\$(e[abcd]x|e[sd]i|ebp|eip|esp|[abcd]h|[abcd]l|\\$0|ra|[sgt]p|t[0-6]|a[0-7]|s([0-9]|1[0-1]))", REG},		//registers
   	{"0[xX][0-9a-fA-F]+",HEX},    //hex numbers
   	{"[0-9]+", NUM},   //numbers
   	{"\\|\\|",OR},
@@ -210,8 +210,22 @@ int32_t eval(int p, int q) {
     } else if (tokens[p].type == HEX) {
         return strtoul(tokens[p].str, NULL, 16); 
     } else if (tokens[p].type == REG) {
+
+		char *reg_name = tokens[p].str + 1;
+    
+    	if (strcmp(reg_name, "eax") == 0) return cpu.eax;
+    	else if (strcmp(reg_name, "ecx") == 0) return cpu.ecx;
+    	else if (strcmp(reg_name, "edx") == 0) return cpu.edx;
+    	else if (strcmp(reg_name, "ebx") == 0) return cpu.ebx;
+    	else if (strcmp(reg_name, "esp") == 0) return cpu.esp;
+    	else if (strcmp(reg_name, "ebp") == 0) return cpu.ebp;
+    	else if (strcmp(reg_name, "esi") == 0) return cpu.esi;
+    	else if (strcmp(reg_name, "edi") == 0) return cpu.edi;
+		else if (strcmp(reg_name, "eip") == 0) return cpu.eip;
+		else {
         printf("Warning: Register %s 这啥也没有啊\n", tokens[p].str);
         return 0;
+		}
     } else {
         panic("eval: 这不是数嘞");
     }
