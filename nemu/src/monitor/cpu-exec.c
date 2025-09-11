@@ -75,7 +75,6 @@ void cpu_exec(volatile uint32_t n) {
 
 		int hit_wp = check_watchpoints();
 		if (hit_wp != -1) {
-			printf("Hit watchpoint %d at address 0x%08x\n", hit_wp, cpu.eip);
 			nemu_state = STOP;
 			return;
 		}
