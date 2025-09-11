@@ -166,7 +166,6 @@ int find_dominant_operator(int p, int q) {
             paren_level--;
         }
         
-        // 括号外的运算符
         if (paren_level == 0) {
             int current_priority = -1;
             
@@ -189,12 +188,17 @@ int find_dominant_operator(int p, int q) {
                 case '/':
                     current_priority = 4;  // 乘除
                     break;
-			/*	case '!':
-        			current_priority = 5;  // 逻辑非
-        			break;	*/
+                case '!':
+                    if (i == p) {
+                        current_priority = 5;  // 逻辑非
+                    } else {
+                        continue;
+                    }
+                    break;
                 default:
                     continue;  
             }
+            
             if (current_priority <= min_priority) {
                 min_priority = current_priority;
                 dominant_op = i;
@@ -234,17 +238,19 @@ int32_t eval(int p, int q) {
     } else {
         panic("eval: 这不是数嘞");
     }
-}	else if (tokens[p].type == '!') {
-		// 逻辑非
-		uint32_t operand = eval(p + 1, q);
-		return !operand;
-	} else if (check_parentheses(p, q)) {
+}	 
+	else if (check_parentheses(p, q)) {
 		return eval(p + 1, q - 1);
 	} else {
 		int dominant_op = find_dominant_operator(p, q);
 		if (dominant_op == -1) {
 			panic("eval: 俺没找到嘞");
 		}
+
+		if (tokens[dominant_op].type == '!') {
+            uint32_t operand = eval(dominant_op + 1, q);
+            return !operand;
+        }
 
 		uint32_t left = eval(p, dominant_op - 1);
 		uint32_t right = eval(dominant_op + 1, q);
@@ -253,7 +259,11 @@ int32_t eval(int p, int q) {
     		case '+': return left + right;
     		case '-': return left - right;
     		case '*': return left * right;
-    		case '/': return left / right;
+    		case '/': 
+				if (right == 0) {
+                    panic("eval: 你学过小学数学吗?");
+                }
+                return left / right;
     		case EQ: return left == right;
     		case NEQ: return left != right;
     		case OR: return left || right;
@@ -282,7 +292,7 @@ int cmd_p_run(char *args) {
     uint32_t result = expr(args, &success);
 
     if (success) {
-        printf("Result: %d\n", result);
+        printf("%d\n", result);
     } else {
         printf("Someting went wrong!\n");
     }
