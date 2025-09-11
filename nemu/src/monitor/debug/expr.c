@@ -169,13 +169,23 @@ int find_dominant_operator(int p, int q) {
             int current_priority = -1;
             
             switch (tokens[i].type) {
+                case OR:
+                    current_priority = 0;  // 逻辑或优先级最低
+                    break;
+                case AND:
+                    current_priority = 1;  // 逻辑与
+                    break;
+                case EQ:
+                case NEQ:
+                    current_priority = 2;  // 比较运算符
+                    break;
                 case '+':
                 case '-':
-                    current_priority = 1;  // 加减
+                    current_priority = 3;  // 加减
                     break;
                 case '*':
                 case '/':
-                    current_priority = 2;  // 乘除
+                    current_priority = 4;  // 乘除优先级最高
                     break;
                 default:
                     continue;  //跳过
@@ -219,11 +229,15 @@ int32_t eval(int p, int q) {
 		uint32_t right = eval(dominant_op + 1, q);
 
 		switch (tokens[dominant_op].type) {
-			case '+': return left + right;
-			case '-': return left - right;
-			case '*': return left * right;
-			case '/': return left / right;
-			default: panic("eval: 俺不认得嘞");
+    		case '+': return left + right;
+    		case '-': return left - right;
+    		case '*': return left * right;
+    		case '/': return left / right;
+    		case EQ: return left == right;
+    		case NEQ: return left != right;
+    		case OR: return left || right;
+   			case AND: return left && right;
+    		default: panic("eval: 俺不认得嘞");
 		}
 	}
 }
