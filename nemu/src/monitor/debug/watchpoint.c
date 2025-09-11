@@ -105,7 +105,7 @@ int check_watchpoints() {
             
             if (success && new_value != wp->old_value) {
                 extern CPU_state cpu;
-                printf("Hit watchpoint %d at address 0x%08x\n", wp->NO, cpu.eip);
+                printf("Hint watchpoint %d at address 0x%08x\n", wp->NO, cpu.eip);
                 printf("Old value = %u\n", wp->old_value);
                 printf("New value = %u\n", new_value);
                 
