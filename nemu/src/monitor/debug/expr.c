@@ -33,7 +33,7 @@ static struct rule {
   	{"\\(", '('},
   	{"\\)", ')'},
   	{"!=",NEQ},        //not equal
-  	{"\\$(\\$0|ra|[sgt]p|t[0-6]|a[0-7]|s([0-9]|1[0-1]))", REG},		//registers
+  	{"\\$(e[abcd]x|e[sd]i|ebp|esp|[abcd]h|[abcd]l|\\$0|ra|[sgt]p|t[0-6]|a[0-7]|s([0-9]|1[0-1]))", REG},		//registers
   	{"0[xX][0-9a-fA-F]+",HEX},    //hex numbers
   	{"[0-9]+", NUM},   //numbers
   	{"\\|\\|",OR},
@@ -195,14 +195,17 @@ int32_t eval(int p, int q) {
 		panic("eval: p > q");
 	}
 	else if (p == q) {
-		if (tokens[p].type == NUM) {
-			return atoi(tokens[p].str);
-		} else if (tokens[p].type == HEX) {
+    if (tokens[p].type == NUM) {
+        return atoi(tokens[p].str);
+    } else if (tokens[p].type == HEX) {
         return strtoul(tokens[p].str, NULL, 16); 
-		} else {
-			panic("eval: 这不是数嘞");
-		}
-	}
+    } else if (tokens[p].type == REG) {
+        printf("Warning: Register %s 这啥也没有啊\n", tokens[p].str);
+        return 0;
+    } else {
+        panic("eval: 这不是数嘞");
+    }
+}
 	else if (check_parentheses(p, q)) {
 		return eval(p + 1, q - 1);
 	}
