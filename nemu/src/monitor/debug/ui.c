@@ -45,13 +45,13 @@ static int cmd_si(char *args) {	//逐步执行程序
     return 0;
 }
 
-static int cmd_info(char *args) {	//打印寄存器状态
+static int cmd_info(char *args) {	
     char *op = strtok(args, " ");
     if (op == NULL) {
         return 0;
     }
 
-    if (strcmp(op, "r") == 0) {
+    if (strcmp(op, "r") == 0) {		//打印寄存器状态
     extern CPU_state cpu;
     printf("eax\t0x%08x\t%-10u\n", cpu.eax, cpu.eax);
     printf("ecx\t0x%08x\t%-10u\n", cpu.ecx, cpu.ecx);
@@ -62,13 +62,15 @@ static int cmd_info(char *args) {	//打印寄存器状态
     printf("esi\t0x%08x\t%-10u\n", cpu.esi, cpu.esi);
     printf("edi\t0x%08x\t%-10u\n", cpu.edi, cpu.edi);
 	printf("eip\t0x%08x\t%-10u\n", cpu.eip, cpu.eip);
+	} else if (strcmp(op, "w") == 0) {		//打印监视点
+        info_watchpoints(); 
 	} else {
-        printf("Unknown info option: %s\n", op);
+        printf("俺不认得嘞: %s\n", op);
     }
     return 0;
 }
 
-static int cmd_x(char *args) {
+static int cmd_x(char *args) {		//扫描内存
   char *sN = strtok(args, " ");
   if (!sN) 
   	return 0;
@@ -98,6 +100,30 @@ static int cmd_p(char *args) {
     return 0;
 }
 
+static int cmd_w(char *args) {		//设置监视点
+    if (args == NULL) {
+        printf("Usage: w EXPR\n");
+        return 0;
+    }
+    
+    int wp_no = set_watchpoint(args);
+    if (wp_no >= 0) {
+        printf("Watchpoint %d set.\n", wp_no);
+    }
+    return 0;
+}
+
+static int cmd_d(char *args) {		//删除监视点
+    if (args == NULL) {
+        printf("Usage: d N  (delete watchpoint N)\n");
+        return 0;
+    }
+    
+    int no = atoi(args);
+    delete_watchpoint(no);
+    return 0;
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -110,8 +136,10 @@ static struct {
 	{ "q", "Exit NEMU", cmd_q },
 	{ "si", "逐步执行", cmd_si },
 	{ "info", "打印程序状态", cmd_info },
-	{ "x", "扫描内存", cmd_x},
-	{ "p", "表达式求值", cmd_p},
+	{ "x", "扫描内存", cmd_x },
+	{ "p", "表达式求值", cmd_p },
+	{ "w", "设置监视点", cmd_w },
+    { "d", "删除监视点", cmd_d },
 
 	/* TODO: Add more commands */
 
