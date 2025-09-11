@@ -33,6 +33,7 @@ static struct rule {
   	{"\\(", '('},
   	{"\\)", ')'},
   	{"!=",NEQ},        //not equal
+	{"!", '!'},
   	{"\\$(e[abcd]x|e[sd]i|ebp|eip|esp|[abcd]h|[abcd]l|\\$0|ra|[sgt]p|t[0-6]|a[0-7]|s([0-9]|1[0-1]))", REG},		//registers
   	{"0[xX][0-9a-fA-F]+",HEX},    //hex numbers
   	{"[0-9]+", NUM},   //numbers
@@ -90,9 +91,10 @@ bool make_token(char *e) {
 				switch(rules[i].token_type) {
 					case NOTYPE:
 						break;
+					case '!':
 					case '+':
 					case '-':
-				case '*':
+					case '*':
 					case '/':
 					case '(':
 					case ')':
@@ -187,6 +189,9 @@ int find_dominant_operator(int p, int q) {
                 case '/':
                     current_priority = 4;  // 乘除
                     break;
+				case '!':
+        			current_priority = 5;  // 逻辑非
+        			break;
                 default:
                     continue;  
             }
@@ -232,6 +237,10 @@ int32_t eval(int p, int q) {
 }
 	else if (check_parentheses(p, q)) {
 		return eval(p + 1, q - 1);
+	} else if (tokens[p].type == '!' && p < q) {
+		// 逻辑非
+		uint32_t operand = eval(p + 1, q);
+		return !operand;
 	}
 	else {
 		int dominant_op = find_dominant_operator(p, q);
