@@ -234,15 +234,13 @@ int32_t eval(int p, int q) {
     } else {
         panic("eval: 这不是数嘞");
     }
-}
-	else if (check_parentheses(p, q)) {
-		return eval(p + 1, q - 1);
-	} else if (tokens[p].type == '!') {
+}	else if (tokens[p].type == '!') {
 		// 逻辑非
 		uint32_t operand = eval(p + 1, q);
 		return !operand;
-	}
-	else {
+	} else if (check_parentheses(p, q)) {
+		return eval(p + 1, q - 1);
+	} else {
 		int dominant_op = find_dominant_operator(p, q);
 		if (dominant_op == -1) {
 			panic("eval: 俺没找到嘞");
