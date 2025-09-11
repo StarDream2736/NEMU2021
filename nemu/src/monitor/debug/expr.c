@@ -9,18 +9,12 @@
 enum {
 	NOTYPE = 256, EQ, NEQ, REG, HEX, NUM, OR, AND, DEREF, NEG
 
-	/* TODO: Add more token types */
-
 };
 
 static struct rule {
 	char *regex;
 	int token_type;
 } rules[] = {
-
-	/* TODO: Add more rules.
-	 * Pay attention to the precedence level of different rules.
-	 */
 
 	{" +",	NOTYPE},				// spaces
 	{"\\+", '+'},					// plus
@@ -45,9 +39,6 @@ static struct rule {
 
 static regex_t re[NR_REGEX];
 
-/* Rules are used for many times.
- * Therefore we compile them only once before any usage.
- */
 void init_regex() {
 	int i;
 	char error_msg[128];
@@ -115,7 +106,7 @@ bool make_token(char *e) {
 	nr_token = 0;
 
 	while(e[position] != '\0') {
-		/* Try all rules one by one. */
+
 		for(i = 0; i < NR_REGEX; i ++) {
 			if(regexec(&re[i], e + position, 1, &pmatch, 0) == 0 && pmatch.rm_so == 0) {
 				char *substr_start = e + position;
@@ -124,7 +115,6 @@ bool make_token(char *e) {
 				Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s", i, rules[i].regex, position, substr_len, substr_len, substr_start);
 				position += substr_len;
 
-				/* Record the token in the array `tokens'. */
 				switch(rules[i].token_type) {
 					case NOTYPE:
 						break;
@@ -285,7 +275,6 @@ int32_t eval(int p, int q) {
 		if (dominant_op == -1) {
 			panic("eval: 俺没找到嘞");
 		}
-
 		// 处理一元运算符
 		if (tokens[dominant_op].type == '!' || tokens[dominant_op].type == NEG || tokens[dominant_op].type == DEREF) {
     		uint32_t operand = eval(dominant_op + 1, q);
