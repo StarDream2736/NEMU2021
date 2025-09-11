@@ -26,8 +26,8 @@ static struct rule {
 	{"\\+", '+'},					// plus
 	{"==", EQ},						// equal
 
+	{"\\-", '-'},  // minus
 	{"-[0-9]+", NUM},// negtive numbers
-  	{"\\-", '-'},  // minus
   	{"\\*", '*'},  // multiply
 	{"/", '/'},    // divide
   	{"\\(", '('},
@@ -170,7 +170,7 @@ int find_dominant_operator(int p, int q) {
             
             switch (tokens[i].type) {
                 case OR:
-                    current_priority = 0;  // 逻辑或优先级最低
+                    current_priority = 0;  // 逻辑或
                     break;
                 case AND:
                     current_priority = 1;  // 逻辑与
@@ -185,10 +185,10 @@ int find_dominant_operator(int p, int q) {
                     break;
                 case '*':
                 case '/':
-                    current_priority = 4;  // 乘除优先级最高
+                    current_priority = 4;  // 乘除
                     break;
                 default:
-                    continue;  //跳过
+                    continue;  
             }
             if (current_priority <= min_priority) {
                 min_priority = current_priority;
