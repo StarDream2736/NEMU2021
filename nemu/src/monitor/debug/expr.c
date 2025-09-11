@@ -189,9 +189,9 @@ int find_dominant_operator(int p, int q) {
                 case '/':
                     current_priority = 4;  // 乘除
                     break;
-				case '!':
+			/*	case '!':
         			current_priority = 5;  // 逻辑非
-        			break;
+        			break;	*/
                 default:
                     continue;  
             }
@@ -237,7 +237,7 @@ int32_t eval(int p, int q) {
 }
 	else if (check_parentheses(p, q)) {
 		return eval(p + 1, q - 1);
-	} else if (tokens[p].type == '!' && p < q) {
+	} else if (tokens[p].type == '!') {
 		// 逻辑非
 		uint32_t operand = eval(p + 1, q);
 		return !operand;
