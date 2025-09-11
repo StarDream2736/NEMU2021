@@ -7,7 +7,7 @@
 #include <regex.h>
 
 enum {
-	NOTYPE = 256, EQ, NEQ, REG, HEX, NUM, OR, AND
+	NOTYPE = 256, EQ, NEQ, REG, HEX, NUM, OR, AND, DEREF, NEG
 
 	/* TODO: Add more token types */
 
@@ -70,6 +70,43 @@ typedef struct token {
 Token tokens[32];
 int nr_token;
 
+bool is_unary_context(int pos) {
+    if (pos == 0) return true;
+    
+    int prev_type = tokens[pos-1].type;
+    return (prev_type == '(' || prev_type == '+' || prev_type == '-' || 
+            prev_type == '*' || prev_type == '/' || prev_type == '!' ||
+            prev_type == EQ || prev_type == NEQ || prev_type == OR || prev_type == AND);
+}
+
+void post_process_tokens() {
+    int i;
+    for (i = 0; i < nr_token; i++) {
+        if (tokens[i].type == '-') {
+            // 检查负数
+            if (is_unary_context(i) && i + 1 < nr_token && tokens[i+1].type == NUM) {
+                // 合并
+                char new_str[32];
+                snprintf(new_str, sizeof(new_str), "-%s", tokens[i+1].str);
+                strcpy(tokens[i].str, new_str);
+                tokens[i].type = NUM;
+                
+                int j;
+                for (j = i + 1; j < nr_token - 1; j++) {
+                    tokens[j] = tokens[j + 1];
+                }
+                nr_token--;
+            } else if (is_unary_context(i)) {
+                tokens[i].type = NEG;
+            }
+        } else if (tokens[i].type == '*') {
+            if (is_unary_context(i)) {
+                tokens[i].type = DEREF;
+            }
+        }
+    }
+}
+
 bool make_token(char *e) {
 	int position = 0;
 	int i;
@@ -128,7 +165,7 @@ bool make_token(char *e) {
 			return false;
 		}
 	}
-
+	post_process_tokens();
 	return true; 
 }
 
@@ -189,6 +226,8 @@ int find_dominant_operator(int p, int q) {
                     current_priority = 4;  // 乘除
                     break;
                 case '!':
+				case NEG:
+				case DEREF:
                     if (i == p) {
                         current_priority = 5;  // 逻辑非
                     } else {
@@ -247,10 +286,21 @@ int32_t eval(int p, int q) {
 			panic("eval: 俺没找到嘞");
 		}
 
-		if (tokens[dominant_op].type == '!') {
-            uint32_t operand = eval(dominant_op + 1, q);
-            return !operand;
-        }
+		// 处理一元运算符
+		if (tokens[dominant_op].type == '!' || tokens[dominant_op].type == NEG || tokens[dominant_op].type == DEREF) {
+    		uint32_t operand = eval(dominant_op + 1, q);
+    
+    		switch (tokens[dominant_op].type) {
+        		case '!':
+            		return !operand;
+        		case NEG:
+            		return -operand;
+        		case DEREF:
+            		return swaddr_read(operand, 4);
+        		default:
+            		panic("eval: 这是啥，俺不认得嘞");
+    		}
+		}
 
 		uint32_t left = eval(p, dominant_op - 1);
 		uint32_t right = eval(dominant_op + 1, q);
